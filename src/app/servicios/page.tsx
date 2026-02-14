@@ -2,34 +2,10 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useServices } from '@/hooks/useApi';
 
 const ServiciosPage = () => {
-    const services = [
-        {
-            title: 'Desarrollo web moderno',
-            description: 'Next.js, React y tecnologías de punta para aplicaciones web rápidas, escalables y SEO-friendly.'
-        },
-        {
-            title: 'Software a medida',
-            description: 'Soluciones personalizadas para automatizar procesos y optimizar operaciones empresariales.'
-        },
-        {
-            title: 'Automatización de procesos',
-            description: 'Integración de sistemas y workflows automáticos que reducen tiempo y errores humanos.'
-        },
-        {
-            title: 'Dashboards y sistemas internos',
-            description: 'Plataformas internas para análisis, reportes y gestión centralizada de datos empresariales.'
-        },
-        {
-            title: 'Integraciones y APIs',
-            description: 'Conecta tus sistemas con soluciones externas o crea APIs robustas y escalables.'
-        },
-        {
-            title: 'Consultoría tecnológica',
-            description: 'Asesoramiento estratégico en arquitectura, performance y escalabilidad de sistemas.'
-        }
-    ];
+    const { services, loading, error } = useServices();
 
     return (
         <div className="bg-black text-white min-h-screen">
@@ -42,10 +18,10 @@ const ServiciosPage = () => {
                         transition={{ duration: 0.6, ease: 'easeOut' }}
                     >
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white tracking-wide mb-6">
-                            Servicios tecnológicos premium
+                            Servicios UGREEN
                         </h1>
                         <p className="text-base md:text-lg text-white/70 font-light tracking-wide leading-relaxed">
-                            Soluciones de ingeniería de software diseñadas para empresas que buscan performance, escalabilidad y diseño de clase mundial.
+                            Servicios premium diseñados para optimizar tu experiencia con nuestros productos y brindarte la mejor atención.
                         </p>
                     </motion.div>
                 </div>
@@ -54,30 +30,40 @@ const ServiciosPage = () => {
             {/* Services Grid */}
             <section className="py-24 md:py-32 px-6 bg-black">
                 <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16">
-                        {services.map((service, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, amount: 0.2 }}
-                                transition={{ duration: 0.5, delay: index * 0.1, ease: 'easeOut' }}
-                                className="group"
-                            >
-                                <div className="space-y-4 p-8 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 h-full flex flex-col">
-                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                                        <span className="text-xs font-medium text-white">✓</span>
+                    {loading ? (
+                        <div className="flex justify-center items-center py-24">
+                            <div className="animate-spin rounded-full h-12 w-12 border border-white/20 border-t-white"></div>
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-24">
+                            <p className="text-white/60 text-lg">No pudimos cargar los servicios. Por favor intenta más tarde.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16">
+                            {services.map((service, index) => (
+                                <motion.div
+                                    key={service.id}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, amount: 0.2 }}
+                                    transition={{ duration: 0.5, delay: index * 0.1, ease: 'easeOut' }}
+                                    className="group"
+                                >
+                                    <div className="space-y-4 p-8 rounded-sm border border-white/10 hover:border-white/20 transition-all duration-300 h-full flex flex-col">
+                                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                                            <span className="text-xs font-medium text-white">✓</span>
+                                        </div>
+                                        <h3 className="text-xl font-medium text-white tracking-wide">
+                                            {service.title}
+                                        </h3>
+                                        <p className="text-sm text-white/60 font-light tracking-wide leading-relaxed flex-grow">
+                                            {service.description}
+                                        </p>
                                     </div>
-                                    <h3 className="text-xl font-medium text-white tracking-wide">
-                                        {service.title}
-                                    </h3>
-                                    <p className="text-sm text-white/60 font-light tracking-wide leading-relaxed flex-grow">
-                                        {service.description}
-                                    </p>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -92,7 +78,7 @@ const ServiciosPage = () => {
                         className="text-center space-y-6"
                     >
                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-white tracking-wide">
-                            Por qué elegir NOVA
+                            Por qué elegir UGREEN
                         </h2>
                         <p className="text-base md:text-lg text-white/70 font-light tracking-wide leading-relaxed">
                             En NOVA entendemos que cada proyecto es único. Nos enfocamos en tres pilares: <strong>performance extremo</strong>, <strong>código escalable</strong> y <strong>diseño minimalista</strong>. No hacemos soluciones genéricas. Hacemos soluciones que duran.

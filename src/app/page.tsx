@@ -2,9 +2,16 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useProducts } from '@/hooks/useApi';
 
 const HomePage = () => {
+    const { products } = useProducts();
+    
+    // Obtener solo los primeros 3 productos
+    const featuredProducts = products.slice(0, 3);
+    
     return (
         <div className="bg-black text-white min-h-screen">
             {/* Hero Section */}
@@ -89,74 +96,40 @@ const HomePage = () => {
 
                     {/* Product Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16">
-                        {/* Product Card 1 */}
-                        <motion.div
-                            className="group cursor-pointer"
-                            whileHover={{ y: -2, scale: 1.02 }}
-                            transition={{ duration: 0.3, ease: "easeOut" }}
-                        >
-                            <div className="relative aspect-square mb-6 overflow-hidden bg-white/5 rounded-sm">
-                                <Image
-                                    src="/images/products/nova-pro-x1.png"
-                                    alt="NOVA Pro X1"
-                                    fill
-                                    className="object-contain p-8"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                />
-                            </div>
-                            <h3 className="text-xl md:text-2xl font-medium text-white tracking-wide mb-2">
-                                NOVA Pro X1
-                            </h3>
-                            <p className="text-sm md:text-base text-white/60 font-light tracking-wide">
-                                Rendimiento profesional
-                            </p>
-                        </motion.div>
-
-                        {/* Product Card 2 */}
-                        <motion.div
-                            className="group cursor-pointer"
-                            whileHover={{ y: -2, scale: 1.02 }}
-                            transition={{ duration: 0.3, ease: "easeOut" }}
-                        >
-                            <div className="relative aspect-square mb-6 overflow-hidden bg-white/5 rounded-sm">
-                                <Image
-                                    src="/images/products/nova-air.png"
-                                    alt="NOVA Air"
-                                    fill
-                                    className="object-contain p-8"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                />
-                            </div>
-                            <h3 className="text-xl md:text-2xl font-medium text-white tracking-wide mb-2">
-                                NOVA Air
-                            </h3>
-                            <p className="text-sm md:text-base text-white/60 font-light tracking-wide">
-                                Portabilidad refinada
-                            </p>
-                        </motion.div>
-
-                        {/* Product Card 3 */}
-                        <motion.div
-                            className="group cursor-pointer"
-                            whileHover={{ y: -2, scale: 1.02 }}
-                            transition={{ duration: 0.3, ease: "easeOut" }}
-                        >
-                            <div className="relative aspect-square mb-6 overflow-hidden bg-white/5 rounded-sm">
-                                <Image
-                                    src="/images/products/nova-studio.png"
-                                    alt="NOVA Studio"
-                                    fill
-                                    className="object-contain p-8"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                />
-                            </div>
-                            <h3 className="text-xl md:text-2xl font-medium text-white tracking-wide mb-2">
-                                NOVA Studio
-                            </h3>
-                            <p className="text-sm md:text-base text-white/60 font-light tracking-wide">
-                                Creatividad sin límites
-                            </p>
-                        </motion.div>
+                        {featuredProducts.map((product, index) => (
+                            <Link
+                                key={product.id}
+                                href={`/productos/${product.slug}`}
+                            >
+                                <motion.div
+                                    className="group cursor-pointer"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, amount: 0.3 }}
+                                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                                    whileHover={{ y: -2, scale: 1.02 }}
+                                >
+                                    <div className="relative aspect-square mb-6 overflow-hidden bg-white/5 rounded-sm">
+                                        <img
+                                            src={product.imageUrl}
+                                            alt={product.name}
+                                            className="w-full h-full object-contain p-8 group-hover:brightness-110 transition-all duration-300"
+                                        />
+                                    </div>
+                                    <h3 className="text-xl md:text-2xl font-medium text-white tracking-wide mb-2">
+                                        {product.name}
+                                    </h3>
+                                    <p className="text-sm md:text-base text-white/60 font-light tracking-wide line-clamp-2">
+                                        {product.description}
+                                    </p>
+                                    {product.price && (
+                                        <p className="text-lg font-semibold text-white/80 mt-2">
+                                            ${product.price.toFixed(2)}
+                                        </p>
+                                    )}
+                                </motion.div>
+                            </Link>
+                        ))}
                     </div>
                 </div>
             </section>

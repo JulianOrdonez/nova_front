@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { submitContactMessage } from '@/hooks/useApi';
 
 const ContactoPage = () => {
     const [formData, setFormData] = useState({
@@ -11,6 +12,8 @@ const ContactoPage = () => {
     });
 
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -18,22 +21,31 @@ const ContactoPage = () => {
             ...prev,
             [name]: value
         }));
+        // Clear error when user starts typing
+        if (error) setError(null);
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError(null);
         
-        // TODO: Conectar con API Route cuando esté listo
-        console.log('Formulario enviado:', formData);
-        
-        // Mostrar confirmación
-        setIsSubmitted(true);
-        
-        // Resetear formulario después de 3 segundos
-        setTimeout(() => {
-            setFormData({ name: '', email: '', message: '' });
-            setIsSubmitted(false);
-        }, 3000);
+        try {
+            await submitContactMessage(formData.name, formData.email, formData.message);
+            
+            // Mostrar confirmación
+            setIsSubmitted(true);
+            
+            // Resetear formulario después de 3 segundos
+            setTimeout(() => {
+                setFormData({ name: '', email: '', message: '' });
+                setIsSubmitted(false);
+            }, 3000);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Error al enviar el mensaje');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -119,7 +131,18 @@ const ContactoPage = () => {
                         </div>
 
                         {/* Submit Button */}
-                        <div className="pt-4">
+                        <div className="pt-4 space-y-3">
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="text-center py-3 bg-red-500/10 border border-red-500/30 rounded-sm"
+                                >
+                                    <p className="text-red-400 font-light tracking-wide">
+                                        ✗ {error}
+                                    </p>
+                                </motion.div>
+                            )}
                             {isSubmitted ? (
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
@@ -133,9 +156,17 @@ const ContactoPage = () => {
                             ) : (
                                 <button
                                     type="submit"
-                                    className="w-full bg-white text-black py-3 rounded-sm font-medium tracking-wide hover:bg-black hover:text-white border border-white transition-all duration-300"
+                                    disabled={isLoading}
+                                    className="w-full bg-white text-black py-3 rounded-sm font-medium tracking-wide hover:bg-black hover:text-white border border-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
-                                    Enviar mensaje
+                                    {isLoading ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-4 w-4 border border-current border-t-transparent"></div>
+                                            Enviando...
+                                        </>
+                                    ) : (
+                                        'Enviar mensaje'
+                                    )}
                                 </button>
                             )}
                         </div>
@@ -165,13 +196,13 @@ const ContactoPage = () => {
                             <div className="space-y-3">
                                 <p className="text-sm font-medium text-white/80 tracking-wide">Email directo</p>
                                 <p className="text-base text-white/70 font-light">
-                                    hola@nova.tech
+                                    soporte@ugreen.com
                                 </p>
                             </div>
                             <div className="space-y-3">
                                 <p className="text-sm font-medium text-white/80 tracking-wide">Teléfono</p>
                                 <p className="text-base text-white/70 font-light">
-                                    +1 (555) 123-4567
+                                    +1 (888) 888-8888
                                 </p>
                             </div>
                         </div>

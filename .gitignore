@@ -40,4 +40,24 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# IDEs and editors
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Prisma
 /src/generated/prisma
+
+# Optional: local database
+*.db
+*.db-journal
