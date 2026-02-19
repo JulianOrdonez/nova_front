@@ -86,7 +86,7 @@ const ProductsPage = () => {
                                                             {product.name}
                                                         </h3>
                                                         <p className="text-xs text-gray-500 mt-1">
-                                                            {product.category.name}
+                                                            {product.category?.name || 'Sin categoría'}
                                                         </p>
                                                     </div>
                                                     {product.price && (

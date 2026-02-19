@@ -6,7 +6,35 @@ import type {
   UseServicesResult,
   UseProductBySlugResult,
 } from '@/types';
-import API_ENDPOINTS from '@/config/api';
+import API_ENDPOINTS, { API_DEFAULT_HEADERS } from '@/config/api';
+
+function normalizeProduct(raw: unknown): Product {
+  const candidate = (raw ?? {}) as Partial<Product> & {
+    categoryName?: string;
+  };
+
+  const category = candidate.category ?? {
+    id: '',
+    name: candidate.categoryName || 'Sin categoría',
+    slug: '',
+  };
+
+  return {
+    id: String(candidate.id ?? ''),
+    name: String(candidate.name ?? ''),
+    slug: String(candidate.slug ?? ''),
+    description: String(candidate.description ?? ''),
+    price:
+      typeof candidate.price === 'number' || candidate.price === null
+        ? candidate.price
+        : null,
+    imageUrl: String(candidate.imageUrl ?? ''),
+    category,
+    isActive: Boolean(candidate.isActive ?? true),
+    createdAt: String(candidate.createdAt ?? ''),
+    updatedAt: String(candidate.updatedAt ?? ''),
+  };
+}
 
 /**
  * Hook: Fetch all active products from FastAPI backend
@@ -20,7 +48,9 @@ export function useProducts(): UseProductsResult {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch(API_ENDPOINTS.products);
+        const response = await fetch(API_ENDPOINTS.products, {
+          headers: API_DEFAULT_HEADERS,
+        });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -28,8 +58,12 @@ export function useProducts(): UseProductsResult {
 
         const data = await response.json();
 
-        if (data.success) {
-          setProducts(data.data);
+        if (Array.isArray(data)) {
+          setProducts(data.map(normalizeProduct));
+          setError(null);
+        } else if (data.success) {
+          const productsData = Array.isArray(data.data) ? data.data : [];
+          setProducts(productsData.map(normalizeProduct));
           setError(null);
         } else {
           throw new Error(data.error || 'Failed to fetch products');
@@ -61,7 +95,9 @@ export function useServices(): UseServicesResult {
     const fetchServices = async () => {
       try {
         setLoading(true);
-        const response = await fetch(API_ENDPOINTS.services);
+        const response = await fetch(API_ENDPOINTS.services, {
+          headers: API_DEFAULT_HEADERS,
+        });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -107,7 +143,9 @@ export function useProductBySlug(slug: string): UseProductBySlugResult {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(API_ENDPOINTS.productBySlug(slug));
+        const response = await fetch(API_ENDPOINTS.productBySlug(slug), {
+          headers: API_DEFAULT_HEADERS,
+        });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -116,7 +154,7 @@ export function useProductBySlug(slug: string): UseProductBySlugResult {
         const data = await response.json();
 
         if (data.success) {
-          setProduct(data.data);
+          setProduct(normalizeProduct(data.data));
           setError(null);
         } else {
           throw new Error(data.error || 'Failed to fetch product');
@@ -148,6 +186,7 @@ export async function submitContactMessage(
     const response = await fetch(API_ENDPOINTS.contact, {
       method: 'POST',
       headers: {
+        ...API_DEFAULT_HEADERS,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ name, email, message }),
