@@ -19,7 +19,7 @@ const API_ENDPOINTS = {
   productBySlug: (slug: string) => `${API_URL}/products/${slug}`,
 
   // Services
-  services: `${API_URL}/api/services`,
+  services: `${API_URL}/services`,
 
   // Contact
   contact: `${API_URL}/api/contact`,

@@ -7,34 +7,8 @@ import type {
   UseProductBySlugResult,
 } from '@/types';
 import API_ENDPOINTS, { API_DEFAULT_HEADERS } from '@/config/api';
-
-function normalizeProduct(raw: unknown): Product {
-  const candidate = (raw ?? {}) as Partial<Product> & {
-    categoryName?: string;
-  };
-
-  const category = candidate.category ?? {
-    id: '',
-    name: candidate.categoryName || 'Sin categoría',
-    slug: '',
-  };
-
-  return {
-    id: String(candidate.id ?? ''),
-    name: String(candidate.name ?? ''),
-    slug: String(candidate.slug ?? ''),
-    description: String(candidate.description ?? ''),
-    price:
-      typeof candidate.price === 'number' || candidate.price === null
-        ? candidate.price
-        : null,
-    imageUrl: String(candidate.imageUrl ?? ''),
-    category,
-    isActive: Boolean(candidate.isActive ?? true),
-    createdAt: String(candidate.createdAt ?? ''),
-    updatedAt: String(candidate.updatedAt ?? ''),
-  };
-}
+import { ProductModel } from '@/models/ProductModel';
+import { ServiceModel } from '@/models/ServicesModel';
 
 /**
  * Hook: Fetch all active products from FastAPI backend
@@ -59,11 +33,10 @@ export function useProducts(): UseProductsResult {
         const data = await response.json();
 
         if (Array.isArray(data)) {
-          setProducts(data.map(normalizeProduct));
+          setProducts(ProductModel.listFromJson(data));
           setError(null);
         } else if (data.success) {
-          const productsData = Array.isArray(data.data) ? data.data : [];
-          setProducts(productsData.map(normalizeProduct));
+          setProducts(ProductModel.listFromJson(data.data));
           setError(null);
         } else {
           throw new Error(data.error || 'Failed to fetch products');
@@ -104,9 +77,11 @@ export function useServices(): UseServicesResult {
         }
 
         const data = await response.json();
-
-        if (data.success) {
-          setServices(data.data);
+        if (Array.isArray(data)) {
+          setServices(ServiceModel.listFromJson(data));
+          setError(null);
+        } else if (data.success) {
+          setServices(ServiceModel.listFromJson(data.data));
           setError(null);
         } else {
           throw new Error(data.error || 'Failed to fetch services');
@@ -154,7 +129,7 @@ export function useProductBySlug(slug: string): UseProductBySlugResult {
         const data = await response.json();
 
         if (data.success) {
-          setProduct(normalizeProduct(data.data));
+          setProduct(ProductModel.fromJson(data.data));
           setError(null);
         } else {
           throw new Error(data.error || 'Failed to fetch product');
