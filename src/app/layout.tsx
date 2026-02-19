@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NOVA - Premium Technology Brand",
+  title: "NØVA - Premium Technology Brand",
   description: "Tecnología premium, diseño minimalista y confiabilidad en cada detalle",
 };
 

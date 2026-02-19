@@ -49,19 +49,19 @@ const ContactoPage = () => {
     };
 
     return (
-        <div className="bg-black text-white min-h-screen">
+        <div className="bg-white text-black min-h-screen">
             {/* Hero Section */}
-            <section className="py-24 md:py-32 px-6 bg-black">
+            <section className="py-24 md:py-32 px-6 bg-white">
                 <div className="max-w-4xl mx-auto text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     >
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white tracking-wide mb-6">
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black tracking-tight mb-6">
                             Conectemos
                         </h1>
-                        <p className="text-base md:text-lg text-white/70 font-light tracking-wide leading-relaxed">
+                        <p className="text-base md:text-lg text-gray-700 leading-relaxed">
                             Cuéntanos sobre tu proyecto, pregunta o inquietud. Responderemos lo antes posible.
                         </p>
                     </motion.div>
@@ -69,19 +69,19 @@ const ContactoPage = () => {
             </section>
 
             {/* Contact Form Section */}
-            <section className="py-24 md:py-32 px-6 bg-black">
+            <section className="py-24 md:py-32 px-6 bg-gray-50 border-t border-gray-200">
                 <div className="max-w-2xl mx-auto">
                     <motion.form
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.3 }}
-                        transition={{ duration: 0.5, ease: 'easeOut' }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                         onSubmit={handleSubmit}
-                        className="space-y-8"
+                        className="space-y-8 bg-white border border-gray-200 rounded-xl p-8"
                     >
                         {/* Name Field */}
                         <div className="space-y-3">
-                            <label htmlFor="name" className="text-sm font-medium text-white/80 tracking-wide">
+                            <label htmlFor="name" className="text-sm font-medium text-black">
                                 Nombre
                             </label>
                             <input
@@ -91,14 +91,14 @@ const ContactoPage = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 rounded-sm bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 transition-all duration-300 font-light"
+                                className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-black placeholder:text-gray-500 focus:outline-none focus:border-black focus:ring-2 focus:ring-gray-300 transition-all"
                                 placeholder="Tu nombre"
                             />
                         </div>
 
                         {/* Email Field */}
                         <div className="space-y-3">
-                            <label htmlFor="email" className="text-sm font-medium text-white/80 tracking-wide">
+                            <label htmlFor="email" className="text-sm font-medium text-black">
                                 Email
                             </label>
                             <input
@@ -108,14 +108,14 @@ const ContactoPage = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 rounded-sm bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 transition-all duration-300 font-light"
+                                className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-black placeholder:text-gray-500 focus:outline-none focus:border-black focus:ring-2 focus:ring-gray-300 transition-all"
                                 placeholder="tu@email.com"
                             />
                         </div>
 
                         {/* Message Field */}
                         <div className="space-y-3">
-                            <label htmlFor="message" className="text-sm font-medium text-white/80 tracking-wide">
+                            <label htmlFor="message" className="text-sm font-medium text-black">
                                 Mensaje
                             </label>
                             <textarea
@@ -125,7 +125,7 @@ const ContactoPage = () => {
                                 onChange={handleChange}
                                 required
                                 rows={6}
-                                className="w-full px-4 py-3 rounded-sm bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 transition-all duration-300 font-light resize-none"
+                                className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-black placeholder:text-gray-500 focus:outline-none focus:border-black focus:ring-2 focus:ring-gray-300 transition-all resize-none"
                                 placeholder="Cuéntanos más sobre tu proyecto..."
                             />
                         </div>
@@ -136,10 +136,10 @@ const ContactoPage = () => {
                                 <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="text-center py-3 bg-red-500/10 border border-red-500/30 rounded-sm"
+                                    className="text-center py-3 bg-gray-100 border border-gray-300 rounded-lg"
                                 >
-                                    <p className="text-red-400 font-light tracking-wide">
-                                        ✗ {error}
+                                    <p className="text-black font-medium">
+                                        {error}
                                     </p>
                                 </motion.div>
                             )}
@@ -147,17 +147,17 @@ const ContactoPage = () => {
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="text-center py-3 bg-white/10 rounded-sm"
+                                    className="text-center py-3 bg-gray-100 rounded-lg"
                                 >
-                                    <p className="text-white font-light tracking-wide">
-                                        ✓ Mensaje recibido. Nos pondremos en contacto pronto.
+                                    <p className="text-black font-medium">
+                                        Mensaje recibido. Nos pondremos en contacto pronto.
                                     </p>
                                 </motion.div>
                             ) : (
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full bg-white text-black py-3 rounded-sm font-medium tracking-wide hover:bg-black hover:text-white border border-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {isLoading ? (
                                         <>
@@ -172,7 +172,7 @@ const ContactoPage = () => {
                         </div>
 
                         {/* Info Note */}
-                        <p className="text-xs text-white/40 font-light tracking-wide text-center">
+                        <p className="text-xs text-gray-500 text-center">
                             Tus datos serán procesados confidencialmente. Consulta nuestra política de privacidad.
                         </p>
                     </motion.form>
@@ -180,28 +180,28 @@ const ContactoPage = () => {
             </section>
 
             {/* Alternative Contact Methods */}
-            <section className="py-24 md:py-32 px-6 bg-black/50 border-t border-white/10">
+            <section className="py-24 md:py-32 px-6 bg-white border-t border-gray-200">
                 <div className="max-w-4xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.3 }}
-                        transition={{ duration: 0.5, ease: 'easeOut' }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                         className="text-center space-y-8"
                     >
-                        <h2 className="text-3xl md:text-4xl font-medium text-white tracking-wide">
+                        <h2 className="text-3xl md:text-4xl font-bold text-black tracking-tight">
                             También puedes contactarnos por
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div className="space-y-3">
-                                <p className="text-sm font-medium text-white/80 tracking-wide">Email directo</p>
-                                <p className="text-base text-white/70 font-light">
+                                <p className="text-sm font-medium text-black">Email directo</p>
+                                <p className="text-base text-gray-700">
                                     soporte@ugreen.com
                                 </p>
                             </div>
                             <div className="space-y-3">
-                                <p className="text-sm font-medium text-white/80 tracking-wide">Teléfono</p>
-                                <p className="text-base text-white/70 font-light">
+                                <p className="text-sm font-medium text-black">Teléfono</p>
+                                <p className="text-base text-gray-700">
                                     +1 (888) 888-8888
                                 </p>
                             </div>
@@ -211,13 +211,13 @@ const ContactoPage = () => {
             </section>
 
             {/* Response Time */}
-            <section className="py-12 px-6 bg-black border-t border-white/10 text-center">
+            <section className="py-12 px-6 bg-gray-50 border-t border-gray-200 text-center">
                 <motion.p
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true, amount: 0.5 }}
-                    transition={{ duration: 0.5, ease: 'easeOut' }}
-                    className="text-xs text-white/40 font-light tracking-wide"
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="text-xs text-gray-500"
                 >
                     Normalmente respondemos dentro de 24–48 horas.
                 </motion.p>

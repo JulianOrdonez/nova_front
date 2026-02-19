@@ -1,44 +1,16 @@
 import { useState, useEffect } from 'react';
+import type {
+  Product,
+  Service,
+  UseProductsResult,
+  UseServicesResult,
+  UseProductBySlugResult,
+} from '@/types';
+import API_ENDPOINTS from '@/config/api';
 
-export interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  price: number | null;
-  imageUrl: string;
-  isActive: boolean;
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Service {
-  id: string;
-  title: string;
-  slug: string;
-  description: string;
-  icon: string;
-  isActive: boolean;
-  createdAt: string;
-}
-
-interface UseProductsResult {
-  products: Product[];
-  loading: boolean;
-  error: string | null;
-}
-
-interface UseServicesResult {
-  services: Service[];
-  loading: boolean;
-  error: string | null;
-}
-
+/**
+ * Hook: Fetch all active products from FastAPI backend
+ */
 export function useProducts(): UseProductsResult {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,14 +20,14 @@ export function useProducts(): UseProductsResult {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/products');
-        
+        const response = await fetch(API_ENDPOINTS.products);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           setProducts(data.data);
           setError(null);
@@ -77,6 +49,9 @@ export function useProducts(): UseProductsResult {
   return { products, loading, error };
 }
 
+/**
+ * Hook: Fetch all active services from FastAPI backend
+ */
 export function useServices(): UseServicesResult {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,14 +61,14 @@ export function useServices(): UseServicesResult {
     const fetchServices = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/services');
-        
+        const response = await fetch(API_ENDPOINTS.services);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           setServices(data.data);
           setError(null);
@@ -115,34 +90,62 @@ export function useServices(): UseServicesResult {
   return { services, loading, error };
 }
 
-export async function useProductBySlug(slug: string): Promise<Product | null> {
-  try {
-    const response = await fetch(`/api/products/${slug}`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+/**
+ * Hook: Fetch a product by slug from FastAPI backend
+ */
+export function useProductBySlug(slug: string): UseProductBySlugResult {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!slug) {
+      setLoading(false);
+      return;
     }
-    
-    const data = await response.json();
-    
-    if (data.success) {
-      return data.data;
-    } else {
-      throw new Error(data.error || 'Failed to fetch product');
-    }
-  } catch (err) {
-    console.error('Error fetching product:', err);
-    return null;
-  }
+
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(API_ENDPOINTS.productBySlug(slug));
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          setProduct(data.data);
+          setError(null);
+        } else {
+          throw new Error(data.error || 'Failed to fetch product');
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        setError(errorMessage);
+        console.error('Error fetching product:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [slug]);
+
+  return { product, loading, error };
 }
 
+/**
+ * Function: Submit contact message to FastAPI backend
+ */
 export async function submitContactMessage(
   name: string,
   email: string,
   message: string
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/contact', {
+    const response = await fetch(API_ENDPOINTS.contact, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -155,7 +158,7 @@ export async function submitContactMessage(
     }
 
     const data = await response.json();
-    
+
     if (data.success) {
       return true;
     } else {

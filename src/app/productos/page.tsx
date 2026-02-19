@@ -5,46 +5,47 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useApi';
+import { Button } from '@/components/ui/Button';
 
 const ProductsPage = () => {
     const { products, loading, error } = useProducts();
 
     return (
-        <div className="bg-black text-white min-h-screen">
+        <div className="bg-white text-black min-h-screen">
             {/* Page Header */}
-            <section className="bg-black py-20 md:py-28 px-6">
+            <section className="bg-white py-20 md:py-28 px-6">
                 <div className="max-w-7xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                         className="text-center"
                     >
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-white tracking-wide mb-4">
-                            Productos UGREEN
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black tracking-tight mb-4">
+                            Productos NØVA
                         </h1>
-                        <p className="text-base md:text-lg text-white/60 font-light tracking-wide">
-                            Tecnología premium, durabilidad confiable y diseño elegante
+                        <p className="text-base md:text-lg text-gray-700 font-normal">
+                            Tecnología profesional, rendimiento confiable y diseño minimalista
                         </p>
                     </motion.div>
                 </div>
             </section>
 
             {/* Products Grid */}
-            <section className="bg-black py-24 md:py-32 px-6">
+            <section className="bg-gray-50 py-24 md:py-32 px-6 border-t border-gray-200">
                 <div className="max-w-7xl mx-auto">
                     {loading && (
                         <div className="text-center py-16">
                             <div className="inline-block">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
                             </div>
-                            <p className="text-white/60 mt-4">Cargando productos...</p>
+                            <p className="text-gray-600 mt-4">Cargando productos...</p>
                         </div>
                     )}
 
                     {error && (
                         <div className="text-center py-16">
-                            <p className="text-red-400">Error al cargar productos: {error}</p>
+                            <p className="text-gray-700">Error al cargar productos: {error}</p>
                         </div>
                     )}
 
@@ -59,14 +60,14 @@ const ProductsPage = () => {
                                         initial={{ opacity: 0, y: 30 }}
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true, amount: 0.2 }}
-                                        transition={{ duration: 0.5, delay: index * 0.1, ease: 'easeOut' }}
+                                        transition={{ duration: 0.5, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
                                     >
-                                        <div className="group cursor-pointer">
+                                        <div className="group cursor-pointer bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300">
                                             {/* Product Image Container */}
                                             <motion.div
-                                                className="relative aspect-square mb-8 overflow-hidden bg-white/5 rounded-sm"
+                                                className="relative aspect-square mb-6 overflow-hidden bg-gray-50 rounded-lg border border-gray-200"
                                                 whileHover={{ scale: 1.02 }}
-                                                transition={{ duration: 0.3, ease: 'easeOut' }}
+                                                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                                             >
                                                 <Image
                                                     src={product.imageUrl}
@@ -81,26 +82,26 @@ const ProductsPage = () => {
                                             <div className="space-y-2">
                                                 <div className="flex justify-between items-start">
                                                     <div>
-                                                        <h3 className="text-xl md:text-2xl font-medium text-white tracking-wide">
+                                                        <h3 className="text-xl md:text-2xl font-semibold text-black tracking-tight">
                                                             {product.name}
                                                         </h3>
-                                                        <p className="text-xs text-white/40 tracking-wide mt-1">
+                                                        <p className="text-xs text-gray-500 mt-1">
                                                             {product.category.name}
                                                         </p>
                                                     </div>
                                                     {product.price && (
-                                                        <span className="text-lg font-semibold text-white/80">
+                                                        <span className="text-lg font-semibold text-black">
                                                             ${product.price.toFixed(2)}
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="text-sm md:text-base text-white/60 font-light tracking-wide leading-relaxed line-clamp-3">
+                                                <p className="text-sm md:text-base text-gray-600 leading-relaxed line-clamp-3">
                                                     {product.description}
                                                 </p>
                                             </div>
 
                                             {/* Divider Line */}
-                                            <div className="h-px bg-white/10 mt-6" />
+                                            <div className="h-px bg-gray-200 mt-6" />
                                         </div>
                                     </motion.div>
                                 </Link>
@@ -111,24 +112,22 @@ const ProductsPage = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="bg-black py-24 md:py-32 px-6 border-t border-white/10">
+            <section className="bg-white py-24 md:py-32 px-6 border-t border-gray-200">
                 <div className="max-w-3xl mx-auto text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.3 }}
-                        transition={{ duration: 0.5, ease: 'easeOut' }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     >
-                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-white tracking-wide mb-6">
-                            ¿Te interesa algún producto?
+                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black tracking-tight mb-6">
+                            ¿Te interesa un producto?
                         </h2>
-                        <p className="text-base md:text-lg text-white/70 font-light tracking-wide mb-12 leading-relaxed">
+                        <p className="text-base md:text-lg text-gray-700 mb-12 leading-relaxed">
                             Contáctanos para conocer más detalles, precios especiales y disponibilidad.
                         </p>
                         <Link href="/contacto">
-                            <button className="inline-block bg-white text-black px-8 py-3 rounded-sm font-medium tracking-wide hover:bg-black hover:text-white border border-white transition-all duration-300">
-                                Ir a contacto
-                            </button>
+                            <Button label="Ir a contacto" variant="outline" size="lg" />
                         </Link>
                     </motion.div>
                 </div>
