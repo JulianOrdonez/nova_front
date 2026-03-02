@@ -7,23 +7,27 @@
  */
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'https://interlineal-toreutic-lyn.ngrok-free.dev';
+  process.env.NEXT_PUBLIC_API_URL || 'https://alembic-postgres-pruebas.onrender.com';
+
+const NORMALIZED_API_URL = API_URL.replace(/\/+$/, '');
 
 const API_DEFAULT_HEADERS = {
-  'ngrok-skip-browser-warning': 'true',
-} as const;
+  ...(NORMALIZED_API_URL.includes('ngrok')
+    ? { 'ngrok-skip-browser-warning': 'true' }
+    : {}),
+};
 
 const API_ENDPOINTS = {
   // Products
-  products: `${API_URL}/products`,
-  productBySlug: (slug: string) => `${API_URL}/products/${slug}`,
+  products: `${NORMALIZED_API_URL}/products`,
+  productBySlug: (slug: string) => `${NORMALIZED_API_URL}/products/${slug}`,
 
   // Services
-  services: `${API_URL}/services`,
+  services: `${NORMALIZED_API_URL}/services`,
 
   // Contact
-  contact: `${API_URL}/api/contact`,
+  contact: `${NORMALIZED_API_URL}/api/contact`,
 } as const;
 
 export default API_ENDPOINTS;
-export { API_URL, API_DEFAULT_HEADERS };
+export { API_URL, NORMALIZED_API_URL, API_DEFAULT_HEADERS };

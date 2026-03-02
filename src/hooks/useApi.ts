@@ -118,7 +118,27 @@ export function useProductBySlug(slug: string): UseProductBySlugResult {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(API_ENDPOINTS.productBySlug(slug), {
+        let response = await fetch(API_ENDPOINTS.productBySlug(slug), {
+          headers: API_DEFAULT_HEADERS,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+
+          if (data.success) {
+            setProduct(ProductModel.fromJson(data.data));
+            setError(null);
+            return;
+          }
+
+          if (data && !data.success && typeof data === 'object' && 'id' in data) {
+            setProduct(ProductModel.fromJson(data));
+            setError(null);
+            return;
+          }
+        }
+
+        response = await fetch(API_ENDPOINTS.products, {
           headers: API_DEFAULT_HEADERS,
         });
 
@@ -127,12 +147,19 @@ export function useProductBySlug(slug: string): UseProductBySlugResult {
         }
 
         const data = await response.json();
+        const products = Array.isArray(data) ? data : data?.data;
 
-        if (data.success) {
-          setProduct(ProductModel.fromJson(data.data));
+        if (!Array.isArray(products)) {
+          throw new Error('Formato inesperado de respuesta de productos');
+        }
+
+        const matched = products.find((item: { slug?: string }) => item?.slug === slug);
+
+        if (matched) {
+          setProduct(ProductModel.fromJson(matched));
           setError(null);
         } else {
-          throw new Error(data.error || 'Failed to fetch product');
+          throw new Error('Producto no encontrado');
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';

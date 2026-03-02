@@ -129,7 +129,7 @@ export const ProductsSection: React.FC = () => {
                     <span className="text-2xl font-bold text-black">
                       ${product.price}
                     </span>
-                    <Link href={`/productos/${product.slug}`}>
+                    <Link href={`/productos/detalle?slug=${encodeURIComponent(product.slug)}`}>
                       <Button
                         label="Ver más"
                         variant="primary"

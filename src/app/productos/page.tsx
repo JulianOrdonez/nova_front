@@ -54,7 +54,7 @@ const ProductsPage = () => {
                             {products.map((product, index) => (
                                 <Link
                                     key={product.id}
-                                    href={`/productos/${product.slug}`}
+                                    href={`/productos/detalle?slug=${encodeURIComponent(product.slug)}`}
                                 >
                                     <motion.div
                                         initial={{ opacity: 0, y: 30 }}
