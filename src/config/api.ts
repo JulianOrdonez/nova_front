@@ -21,6 +21,10 @@ const API_ENDPOINTS = {
   // Services
   services: `${API_URL}/services`,
 
+  // Auth
+  authLogin: `${API_URL}/login`,
+  authRegister: `${API_URL}/users`,
+
   // Contact
   contact: `${API_URL}/api/contact`,
 } as const;
