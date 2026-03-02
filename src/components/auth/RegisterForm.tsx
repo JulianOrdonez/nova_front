@@ -9,10 +9,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import type { RegisterCredentials } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 export const RegisterForm: React.FC = () => {
+  const router = useRouter();
+  const { register } = useAuth();
   const [credentials, setCredentials] = useState<RegisterCredentials>({
     name: '',
     email: '',
@@ -61,14 +65,14 @@ export const RegisterForm: React.FC = () => {
     setError(null);
 
     try {
-      // Aquí se conectará a FastAPI
-      console.log('Register attempt:', { ...credentials, confirmPassword: '***' });
+      const success = await register(credentials);
 
-      // Simulación
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!success) {
+        setError('No se pudo crear la cuenta. Intenta de nuevo.');
+        return;
+      }
 
-      // TODO: Llamar a API de FastAPI
-      // const response = await fetch('${API_URL}/api/auth/register', {...})
+      router.push('/productos');
     } catch (err) {
       setError('Error al crear la cuenta. Intenta de nuevo.');
       console.error(err);

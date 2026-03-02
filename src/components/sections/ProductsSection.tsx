@@ -6,64 +6,15 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import type { Product } from '@/types';
+import { useProducts } from '@/hooks/useApi';
 
 export const ProductsSection: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Placeholder para cuando conectemos a FastAPI
-    // Por ahora mostramos datos de ejemplo
-    const mockProducts: Product[] = [
-      {
-        id: '1',
-        name: 'Cloud Manager Pro',
-        slug: 'cloud-manager-pro',
-        description: 'Solución completa para gestión de servidores en la nube',
-        price: 99.99,
-        imageUrl: 'https://via.placeholder.com/300x200?text=Cloud+Manager',
-        category: { id: '1', name: 'Enterprise', slug: 'enterprise' },
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        name: 'Data Analytics Suite',
-        slug: 'data-analytics-suite',
-        description: 'Herramientas avanzadas para análisis de datos en tiempo real',
-        price: 149.99,
-        imageUrl: 'https://via.placeholder.com/300x200?text=Data+Analytics',
-        category: { id: '1', name: 'Enterprise', slug: 'enterprise' },
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: '3',
-        name: 'Security Premium',
-        slug: 'security-premium',
-        description: 'Protección de seguridad de máximo nivel para tu infraestructura',
-        price: 199.99,
-        imageUrl: 'https://via.placeholder.com/300x200?text=Security+Premium',
-        category: { id: '1', name: 'Enterprise', slug: 'enterprise' },
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ];
-
-    setTimeout(() => {
-      setProducts(mockProducts);
-      setLoading(false);
-    }, 500);
-  }, []);
+  const { products, loading, error } = useProducts();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -99,16 +50,24 @@ export const ProductsSection: React.FC = () => {
             Productos Destacados
           </h2>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Soluciones software de alta calidad diseñadas para potenciar tu negocio
+            Tecnología de alta calidad para potenciar tu trabajo y vida digital
           </p>
         </motion.div>
 
         {/* Products Grid */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-64 bg-gray-200 rounded-xl animate-pulse" />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-96 bg-gray-200 rounded-xl animate-pulse" />
             ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600">Error: {error}</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600">No hay productos disponibles</p>
           </div>
         ) : (
           <motion.div
@@ -118,17 +77,26 @@ export const ProductsSection: React.FC = () => {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            {products.map((product) => (
+            {products.slice(0, 6).map((product) => (
               <motion.div key={product.id} variants={itemVariants}>
                 <Card
                   title={product.name}
                   description={product.description}
                   image={product.imageUrl}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-black">
-                      ${product.price}
-                    </span>
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div>
+                      {product.price !== null ? (
+                        <span className="text-2xl font-bold text-black">
+                          ${product.price.toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-500 italic">Consultar precio</span>
+                      )}
+                      {product.category && (
+                        <p className="text-xs text-gray-500 mt-1">{product.category.name}</p>
+                      )}
+                    </div>
                     <Link href={`/productos/${product.slug}`}>
                       <Button
                         label="Ver más"
@@ -144,17 +112,19 @@ export const ProductsSection: React.FC = () => {
         )}
 
         {/* CTA */}
-        <motion.div
-          className="text-center mt-16"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          <Link href="/productos">
-            <Button label="Ver todos los productos" variant="outline" size="lg" />
-          </Link>
-        </motion.div>
+        {products.length > 0 && (
+          <motion.div
+            className="text-center mt-16"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <Link href="/productos">
+              <Button label="Ver todos los productos" variant="outline" size="lg" />
+            </Link>
+          </motion.div>
+        )}
       </div>
     </section>
   );

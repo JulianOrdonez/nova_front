@@ -9,10 +9,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import type { LoginCredentials } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 
 export const LoginForm: React.FC = () => {
+  const router = useRouter();
+  const { login } = useAuth();
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
     password: '',
@@ -35,14 +39,14 @@ export const LoginForm: React.FC = () => {
     setError(null);
 
     try {
-      // Aquí se conectará a FastAPI
-      console.log('Login attempt:', credentials);
+      const success = await login(credentials);
 
-      // Simulación
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!success) {
+        setError('Credenciales inválidas. Intenta de nuevo.');
+        return;
+      }
 
-      // TODO: Llamar a API de FastAPI
-      // const response = await fetch('${API_URL}/api/auth/login', {...})
+      router.push('/productos');
     } catch (err) {
       setError('Error al iniciar sesión. Intenta de nuevo.');
       console.error(err);

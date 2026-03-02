@@ -3,10 +3,30 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useServices } from '@/hooks/useApi';
+import { getIcon } from '@/utils/iconMapper';
 import { Button } from '@/components/ui/Button';
 
 const ServiciosPage = () => {
     const { services, loading, error } = useServices();
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.08,
+            },
+        },
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5 },
+        },
+    };
 
     return (
         <div className="bg-white text-black min-h-screen">
@@ -36,33 +56,62 @@ const ServiciosPage = () => {
                             <div className="animate-spin rounded-full h-12 w-12 border border-gray-300 border-t-black"></div>
                         </div>
                     ) : error ? (
-                        <div className="text-center py-24">
-                            <p className="text-gray-700 text-lg">No pudimos cargar los servicios. Por favor intenta más tarde.</p>
+                        <div className="text-center py-16">
+                            <p className="text-red-600">Error: {error}</p>
                         </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16">
-                            {services.map((service, index) => (
+                    ) : services.length > 0 ? (
+                        <motion.div 
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
+                            {services.map((service) => (
                                 <motion.div
                                     key={service.id}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true, amount: 0.2 }}
-                                    transition={{ duration: 0.5, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                                    className="group"
+                                    variants={itemVariants}
+                                    className="group bg-white rounded-xl border-2 border-gray-200 hover:border-black p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
                                 >
-                                    <div className="space-y-4 p-8 rounded-xl border border-gray-200 bg-white hover:shadow-lg transition-all duration-300 h-full flex flex-col">
-                                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                                            <span className="text-xs font-semibold text-black">✓</span>
-                                        </div>
-                                        <h3 className="text-xl font-semibold text-black tracking-tight">
-                                            {service.title}
-                                        </h3>
-                                        <p className="text-sm text-gray-600 leading-relaxed grow">
-                                            {service.description}
-                                        </p>
+                                    <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
+                                        {getIcon(service.icon)}
                                     </div>
+                                    <h3 className="text-xl font-bold text-black mb-3">
+                                        {service.title}
+                                    </h3>
+                                    {service.shortDescription && (
+                                        <p className="text-sm text-gray-700 font-medium mb-3">
+                                            {service.shortDescription}
+                                        </p>
+                                    )}
+                                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                                        {service.description}
+                                    </p>
+                                    {service.features && service.features.length > 0 && (
+                                        <div className="mb-4 space-y-1">
+                                            {service.features.slice(0, 4).map((feature, idx) => (
+                                                <div key={idx} className="flex items-start text-xs text-gray-600">
+                                                    <span className="text-black mr-1.5">✓</span>
+                                                    <span>{feature}</span>
+                                                </div>
+                                            ))}
+                                            {service.features.length > 4 && (
+                                                <p className="text-xs text-gray-500 italic pl-4">
+                                                    +{service.features.length - 4} más
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+                                    {service.priceRange && (
+                                        <div className="mt-4 pt-4 border-t border-gray-200">
+                                            <p className="text-sm font-bold text-black">{service.priceRange}</p>
+                                        </div>
+                                    )}
                                 </motion.div>
                             ))}
+                        </motion.div>
+                    ) : (
+                        <div className="text-center py-16">
+                            <p className="text-gray-600">No hay servicios disponibles</p>
                         </div>
                     )}
                 </div>
