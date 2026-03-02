@@ -8,6 +8,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  roleId: number;
   role: 'admin' | 'user' | 'guest';
   createdAt: string;
   updatedAt: string;
@@ -33,17 +34,18 @@ export interface RegisterCredentials extends LoginCredentials {
 
 // ============== PRODUCT ==============
 export interface Category {
-  id: string;
+  id: number;
   name: string;
   slug: string;
 }
 
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   description: string;
   price: number | null;
+  stok: number | null;
   imageUrl: string;
   category: Category;
   isActive: boolean;
@@ -56,12 +58,13 @@ export interface CreateProductDTO {
   slug: string;
   description: string;
   price: number | null;
+  stok: number | null;
   imageUrl: string;
-  categoryId: string;
+  categoryId: number;
 }
 
 export interface UpdateProductDTO extends Partial<CreateProductDTO> {
-  id: string;
+  id: number;
 }
 
 // ============== SERVICE ==============
@@ -71,8 +74,12 @@ export interface Service {
   slug: string;
   description: string;
   icon: string;
+  priceRange?: string;
+  shortDescription?: string;
+  features?: string[];
   isActive: boolean;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface CreateServiceDTO {
@@ -148,6 +155,7 @@ export interface UseAuthResult {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (credentials: LoginCredentials) => Promise<boolean>;
   register: (credentials: RegisterCredentials) => Promise<boolean>;
   logout: () => void;

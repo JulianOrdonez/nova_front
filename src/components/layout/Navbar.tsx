@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const { user, isAdmin, isAuthenticated, logout } = useAuth();
 
     const navLinks = [
         { href: '/', label: 'Inicio' },
@@ -54,18 +56,39 @@ const Navbar = () => {
 
                         {/* Desktop Auth Buttons */}
                         <div className="hidden md:flex items-center gap-3">
-                            <Link href="/auth/login">
-                                <button className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors">
-                                    Iniciar Sesión
-                                </button>
-                            </Link>
-                            <Link href="/auth/register">
-                                <Button
-                                    label="Registrarse"
-                                    variant="primary"
-                                    size="sm"
-                                />
-                            </Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                        <span>Hola, {user?.name || 'Usuario'}</span>
+                                        {isAdmin && (
+                                            <span className="px-2 py-0.5 text-xs font-semibold bg-yellow-500 text-black rounded-full">
+                                                Admin
+                                            </span>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={logout}
+                                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors"
+                                    >
+                                        Cerrar Sesión
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href="/auth/login">
+                                        <button className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors">
+                                            Iniciar Sesión
+                                        </button>
+                                    </Link>
+                                    <Link href="/auth/register">
+                                        <Button
+                                            label="Registrarse"
+                                            variant="primary"
+                                            size="sm"
+                                        />
+                                    </Link>
+                                </>
+                            )}
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -113,19 +136,43 @@ const Navbar = () => {
                             
                             {/* Mobile Auth Section */}
                             <div className="pt-6 border-t border-gray-100 flex flex-col gap-3">
-                                <Link href="/auth/login" onClick={closeMenu}>
-                                    <button className="w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors text-left">
-                                        Iniciar Sesión
-                                    </button>
-                                </Link>
-                                <Link href="/auth/register" onClick={closeMenu}>
-                                    <Button
-                                        label="Registrarse"
-                                        variant="primary"
-                                        size="sm"
-                                        className="w-full"
-                                    />
-                                </Link>
+                                {isAuthenticated ? (
+                                    <>
+                                        <div className="px-4 text-sm font-medium text-gray-700">
+                                            Hola, {user?.name || 'Usuario'}
+                                            {isAdmin && (
+                                                <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-yellow-500 text-black rounded-full">
+                                                    Admin
+                                                </span>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                logout();
+                                                closeMenu();
+                                            }}
+                                            className="w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors text-left"
+                                        >
+                                            Cerrar Sesión
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Link href="/auth/login" onClick={closeMenu}>
+                                            <button className="w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors text-left">
+                                                Iniciar Sesión
+                                            </button>
+                                        </Link>
+                                        <Link href="/auth/register" onClick={closeMenu}>
+                                            <Button
+                                                label="Registrarse"
+                                                variant="primary"
+                                                size="sm"
+                                                className="w-full"
+                                            />
+                                        </Link>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </motion.div>
