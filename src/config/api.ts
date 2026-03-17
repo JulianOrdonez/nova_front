@@ -25,8 +25,19 @@ const API_ENDPOINTS = {
   authLogin: `${API_URL}/login`,
   authRegister: `${API_URL}/users`,
 
+  // Cart
+  carritos: `${API_URL}/carritos`,
+  cartItems: `${API_URL}/cart-items`,
+
+  // Orders
+  orders: `${API_URL}/orders`,
+  orderItems: `${API_URL}/order-items`,
+  payments: `${API_URL}/payments`,
+
   // Contact
   contact: `${API_URL}/api/contact`,
+  // Temporary compatibility alias while callers migrate to `cartItems`
+  CartItems: `${API_URL}/cart-items`,
 } as const;
 
 export default API_ENDPOINTS;

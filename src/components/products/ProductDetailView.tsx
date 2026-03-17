@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
+import { AddToCartButton } from '@/components/products/AddToCartButton';
 import type { Product } from '@/types';
 
 interface ProductDetailViewProps {
@@ -13,6 +14,7 @@ interface ProductDetailViewProps {
 export const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product }) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isImageHovered, setIsImageHovered] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const { scrollYProgress } = useScroll();
   
   // Parallax effects
@@ -202,36 +204,54 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({ product })
 
             {/* CTA Buttons */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4"
+              className="space-y-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
             >
-              <Link href="/contacto" className="flex-1">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full"
-                >
-                  <Button
-                    label="Solicitar información"
-                    variant="primary"
-                    size="lg"
-                    className="w-full shadow-2xl hover:shadow-black/20"
-                  />
-                </motion.div>
-              </Link>
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button
-                  label="Cotizar"
-                  variant="outline"
-                  size="lg"
-                  onClick={() => window.open('/contacto', '_blank')}
-                />
-              </motion.div>
+              {/* Quantity selector + Add to Cart */}
+              {product.price !== null && product.isActive && (
+                <div className="flex items-center gap-4">
+                  {/* Quantity */}
+                  <div className="flex items-center border-2 border-gray-300 rounded-xl overflow-hidden bg-white">
+                    <button
+                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                      className="px-4 py-3 text-lg font-bold hover:bg-gray-100 transition-colors"
+                    >
+                      −
+                    </button>
+                    <span className="px-5 py-3 text-lg font-semibold min-w-12 text-center">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(q => q + 1)}
+                      className="px-4 py-3 text-lg font-bold hover:bg-gray-100 transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className="flex-1">
+                    <AddToCartButton productId={product.id} quantity={quantity} variant="full" />
+                  </div>
+                </div>
+              )}
+
+              {/* Secondary actions */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/contacto" className="flex-1">
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full">
+                    <Button
+                      label="Solicitar información"
+                      variant="outline"
+                      size="lg"
+                      className="w-full"
+                    />
+                  </motion.div>
+                </Link>
+                {!product.isActive && (
+                  <span className="flex-1 flex items-center justify-center px-6 py-3 rounded-xl bg-gray-100 text-gray-500 font-semibold text-base">
+                    Sin stock
+                  </span>
+                )}
+              </div>
             </motion.div>
 
             {/* Divider */}

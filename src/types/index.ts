@@ -106,6 +106,22 @@ export interface ContactResponse {
   error?: string;
 }
 
+// ============== CART ==============
+export interface CartItem {
+  cartItemId?: string | number;
+  productId: number;
+  quantity: number;
+  product?: Product;
+}
+
+export interface Cart {
+  id: string | number;
+  userId?: string;
+  items: CartItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ============== ORDER ==============
 export interface Order {
   id: string;
@@ -156,6 +172,7 @@ export interface UseAuthResult {
   loading: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  token: string | null;
   login: (credentials: LoginCredentials) => Promise<boolean>;
   register: (credentials: RegisterCredentials) => Promise<boolean>;
   logout: () => void;

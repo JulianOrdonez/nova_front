@@ -42,14 +42,71 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Load token from localStorage on mount
-    const storedToken = localStorage.getItem('auth_token');
-    if (storedToken) {
-      setToken(storedToken);
-    }
-    setLoading(false);
+  const clearSession = useCallback(() => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
   }, []);
+
+  const applySession = useCallback((nextUser: User, nextToken: string | null) => {
+    setUser(nextUser);
+    setToken(nextToken);
+
+    if (nextToken) {
+      localStorage.setItem('auth_token', nextToken);
+      localStorage.setItem('auth_user', JSON.stringify(nextUser));
+      return;
+    }
+
+    // Fallback for backends that authenticate with cookie but no token payload.
+    localStorage.removeItem('auth_token');
+    localStorage.setItem('auth_user', JSON.stringify(nextUser));
+  }, []);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('auth_token');
+    const storedUser = localStorage.getItem('auth_user');
+
+    if (storedToken && storedUser) {
+      try {
+        setToken(storedToken);
+        setUser(mapUser(JSON.parse(storedUser)));
+      } catch (err) {
+        console.warn('Invalid auth data in localStorage, clearing session', err);
+        clearSession();
+      }
+    }
+
+    setLoading(false);
+  }, [clearSession]);
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== 'auth_token' && event.key !== 'auth_user') {
+        return;
+      }
+
+      const nextToken = localStorage.getItem('auth_token');
+      const nextUserRaw = localStorage.getItem('auth_user');
+
+      if (!nextToken || !nextUserRaw) {
+        setUser(null);
+        setToken(null);
+        return;
+      }
+
+      try {
+        setToken(nextToken);
+        setUser(mapUser(JSON.parse(nextUserRaw)));
+      } catch {
+        clearSession();
+      }
+    };
+
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [clearSession]);
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<boolean> => {
     try {
@@ -75,17 +132,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const mappedUser = mapUser(userData);
       const accessToken = data.access_token || data.token;
 
-      setUser(mappedUser);
-      if (accessToken) {
-        setToken(accessToken);
-        localStorage.setItem('auth_token', accessToken);
-      }
+      applySession(mappedUser, accessToken ?? null);
       return true;
     } catch (error) {
       console.error('Login error:', error);
       return false;
     }
-  }, []);
+  }, [applySession]);
 
   const register = useCallback(async (credentials: RegisterCredentials): Promise<boolean> => {
     try {
@@ -113,23 +166,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const mappedUser = mapUser(userData);
       const accessToken = data.access_token || data.token;
 
-      setUser(mappedUser);
-      if (accessToken) {
-        setToken(accessToken);
-        localStorage.setItem('auth_token', accessToken);
-      }
+      applySession(mappedUser, accessToken ?? null);
       return true;
     } catch (error) {
       console.error('Register error:', error);
       return false;
     }
-  }, []);
+  }, [applySession]);
 
   const logout = useCallback(() => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('auth_token');
-  }, []);
+    clearSession();
+  }, [clearSession]);
 
   const value = useMemo<UseAuthResult>(() => {
     return {
@@ -137,11 +184,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loading,
       isAuthenticated: Boolean(user),
       isAdmin: user?.roleId === AUTH_ROLE_ADMIN,
+      token,
       login,
       register,
       logout,
     };
-  }, [user, loading, login, register, logout]);
+  }, [user, loading, token, login, register, logout]);
 
   const provider = React.createElement(AuthContext.Provider, { value }, children);
   return provider;

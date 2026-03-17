@@ -4,21 +4,22 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useProducts } from '@/hooks/useApi';
-import { getAuthHeaders, useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { CreateProductModal } from '@/components/products/CreateProductModal';
+import { AddToCartButton } from '@/components/products/AddToCartButton';
 import API_ENDPOINTS, { API_DEFAULT_HEADERS } from '@/config/api';
 
 const ProductsPage = () => {
     const { products, loading, error } = useProducts();
     const { isAdmin } = useAuth();
-    const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+    const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
     // Handle product selection for batch delete
-    const toggleProductSelection = (productId: string) => {
+    const toggleProductSelection = (productId: number) => {
         setSelectedProducts((prev) =>
             prev.includes(productId)
                 ? prev.filter((id) => id !== productId)
@@ -234,22 +235,27 @@ const ProductsPage = () => {
                                         description={product.description}
                                         image={product.imageUrl}
                                     >
-                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                            <div>
-                                                {product.price !== null ? (
-                                                    <span className="text-2xl font-bold text-black">
-                                                        ${product.price.toFixed(2)}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-sm text-gray-500 italic">Consultar precio</span>
-                                                )}
-                                                {product.category && (
-                                                    <p className="text-xs text-gray-500 mt-1">{product.category.name}</p>
-                                                )}
+                                        <div className="pt-4 border-t border-gray-100 space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    {product.price !== null ? (
+                                                        <span className="text-2xl font-bold text-black">
+                                                            ${product.price.toFixed(2)}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-sm text-gray-500 italic">Consultar precio</span>
+                                                    )}
+                                                    {product.category && (
+                                                        <p className="text-xs text-gray-500 mt-1">{product.category.name}</p>
+                                                    )}
+                                                </div>
+                                                <Link href={`/productos/${product.slug}`}>
+                                                    <Button label="Ver detalles" variant="outline" size="sm" />
+                                                </Link>
                                             </div>
-                                            <Link href={`/productos/${product.slug}`}>
-                                                <Button label="Ver detalles" variant="primary" size="sm" />
-                                            </Link>
+                                            {product.price !== null && (
+                                                <AddToCartButton productId={product.id} variant="compact" className="w-full justify-center" />
+                                            )}
                                         </div>
                                     </Card>
                                 </motion.div>

@@ -2,13 +2,17 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
 
 const Navbar = () => {
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
-    const { user, isAdmin, isAuthenticated, logout } = useAuth();
+    const { user, isAdmin, isAuthenticated, loading: authLoading, logout } = useAuth();
+    const { itemCount } = useCart();
 
     const navLinks = [
         { href: '/', label: 'Inicio' },
@@ -24,6 +28,13 @@ const Navbar = () => {
 
     const closeMenu = () => {
         setIsOpen(false);
+    };
+
+    const handleLogout = () => {
+        logout();
+        closeMenu();
+        router.replace('/');
+        router.refresh();
     };
 
     return (
@@ -56,18 +67,30 @@ const Navbar = () => {
 
                         {/* Desktop Auth Buttons */}
                         <div className="hidden md:flex items-center gap-3">
-                            {isAuthenticated ? (
+                            <Link href="/carrito" className="relative p-2 text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-100" aria-label="Carrito de compras">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                </svg>
+                                {itemCount > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 min-w-4.5 h-4.5 px-0.5 rounded-full bg-black text-white text-[10px] font-bold leading-4.5 text-center">
+                                        {itemCount > 99 ? '99+' : itemCount}
+                                    </span>
+                                )}
+                            </Link>
+                            {authLoading ? (
+                                <span className="px-4 py-2 text-sm font-medium text-gray-500">Cargando...</span>
+                            ) : isAuthenticated ? (
                                 <>
-                                    <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                                        <span>Hola, {user?.name || 'Usuario'}</span>
+                                    <Link href="/mi-cuenta" className="relative p-2 text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-100" aria-label="Ir a mi cuenta">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275" />
+                                        </svg>
                                         {isAdmin && (
-                                            <span className="px-2 py-0.5 text-xs font-semibold bg-yellow-500 text-black rounded-full">
-                                                Admin
-                                            </span>
+                                            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-yellow-500 border border-white"></span>
                                         )}
-                                    </div>
+                                    </Link>
                                     <button
-                                        onClick={logout}
+                                        onClick={handleLogout}
                                         className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors"
                                     >
                                         Cerrar Sesión
@@ -136,21 +159,25 @@ const Navbar = () => {
                             
                             {/* Mobile Auth Section */}
                             <div className="pt-6 border-t border-gray-100 flex flex-col gap-3">
-                                {isAuthenticated ? (
+                                <Link
+                                    href="/carrito"
+                                    onClick={closeMenu}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                    </svg>
+                                    Carrito {itemCount > 0 ? `(${itemCount})` : ''}
+                                </Link>
+                                {authLoading ? (
+                                    <div className="px-4 text-sm font-medium text-gray-500">Cargando...</div>
+                                ) : isAuthenticated ? (
                                     <>
-                                        <div className="px-4 text-sm font-medium text-gray-700">
-                                            Hola, {user?.name || 'Usuario'}
-                                            {isAdmin && (
-                                                <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-yellow-500 text-black rounded-full">
-                                                    Admin
-                                                </span>
-                                            )}
-                                        </div>
+                                        <Link href="/mi-cuenta" onClick={closeMenu} className="w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors text-left">
+                                            Mi cuenta {isAdmin ? '(Admin)' : ''}
+                                        </Link>
                                         <button
-                                            onClick={() => {
-                                                logout();
-                                                closeMenu();
-                                            }}
+                                            onClick={handleLogout}
                                             className="w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors text-left"
                                         >
                                             Cerrar Sesión
