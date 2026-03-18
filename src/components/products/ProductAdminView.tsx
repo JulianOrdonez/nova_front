@@ -21,7 +21,7 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: product.name,
@@ -38,12 +38,12 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
-    
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
-    
+
     // Clear error for this field
     if (errors[name]) {
       setErrors((prev) => {
@@ -132,6 +132,58 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
     }
   };
 
+  const preset_name = 'novatechimages'
+  const cloud_name = 'dlknke1am'
+
+  const [loading, setLoading] = useState(false)
+
+  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const files = e.target.files as FileList;
+    if (!files?.[0]) {
+      return;
+    }
+
+    const data = new FormData();
+    data.append('file', files[0]);
+    data.append('upload_preset', preset_name);
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, {
+        method: 'POST',
+        body: data
+      });
+
+      if (!response.ok) {
+        throw new Error('Cloudinary upload failed');
+      }
+
+      const file = (await response.json()) as CloudinaryResponse;
+      setFormData((prev) => ({
+        ...prev,
+        imageUrl: file.secure_url,
+      }));
+
+      if (errors.imageUrl) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.imageUrl;
+          return newErrors;
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  interface CloudinaryResponse {
+    secure_url: string;
+    [key: string]: unknown;
+  }
+
   return (
     <div className="bg-linear-to-b from-white via-gray-50 to-white text-black min-h-screen">
       {/* Admin Header */}
@@ -147,7 +199,7 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
             </motion.div>
             <span className="text-sm text-gray-300">Editando producto</span>
           </div>
-          
+
           <div className="flex items-center gap-3">
             {!isEditing ? (
               <>
@@ -280,15 +332,14 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
                       </div>
                     )}
                   </motion.div>
-                  
+
                   {/* Status Preview */}
                   <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                     <h3 className="font-semibold text-black mb-3">Estado del producto</h3>
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-4 h-4 rounded-full ${
-                          formData.isActive ? 'bg-green-500' : 'bg-red-500'
-                        }`}
+                        className={`w-4 h-4 rounded-full ${formData.isActive ? 'bg-green-500' : 'bg-red-500'
+                          }`}
                       />
                       <span className="text-gray-700">
                         {formData.isActive ? 'Activo y visible' : 'Inactivo y oculto'}
@@ -300,7 +351,7 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
                 {/* Edit Form */}
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-black">Editar información</h2>
-                  
+
                   <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 space-y-6">
                     {/* Name Field */}
                     <div>
@@ -312,9 +363,8 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
                         name="name"
                         value={formData.name}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all ${
-                          errors.name ? 'border-red-500' : 'border-gray-200'
-                        }`}
+                        className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all ${errors.name ? 'border-red-500' : 'border-gray-200'
+                          }`}
                         placeholder="Ej: Cable USB-C Premium"
                       />
                       {errors.name && (
@@ -332,9 +382,8 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
                         value={formData.description}
                         onChange={handleInputChange}
                         rows={6}
-                        className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all resize-none ${
-                          errors.description ? 'border-red-500' : 'border-gray-200'
-                        }`}
+                        className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all resize-none ${errors.description ? 'border-red-500' : 'border-gray-200'
+                          }`}
                         placeholder="Descripción detallada del producto..."
                       />
                       {errors.description && (
@@ -356,9 +405,8 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
                           name="price"
                           value={formData.price}
                           onChange={handleInputChange}
-                          className={`w-full pl-8 pr-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all ${
-                            errors.price ? 'border-red-500' : 'border-gray-200'
-                          }`}
+                          className={`w-full pl-8 pr-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all ${errors.price ? 'border-red-500' : 'border-gray-200'
+                            }`}
                           placeholder="29.99"
                         />
                       </div>
@@ -377,9 +425,8 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
                         name="stok"
                         value={formData.stok}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all ${
-                          errors.stok ? 'border-red-500' : 'border-gray-200'
-                        }`}
+                        className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all ${errors.stok ? 'border-red-500' : 'border-gray-200'
+                          }`}
                         placeholder="50"
                       />
                       {errors.stok && (
@@ -395,13 +442,35 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
                       <input
                         type="text"
                         name="imageUrl"
+                        disabled
                         value={formData.imageUrl}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all ${
-                          errors.imageUrl ? 'border-red-500' : 'border-gray-200'
-                        }`}
+                        className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all ${errors.imageUrl ? 'border-red-500' : 'border-gray-200'
+                          }`}
                         placeholder="https://example.com/image.jpg"
                       />
+                      {errors.imageUrl && (
+                        <p className="text-red-500 text-sm mt-2">{errors.imageUrl}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-black mb-2">
+                        Imagen
+                      </label>
+                      <input
+                        type="file"
+                        name="imageUrl"
+                        //value={formData.imageUrl}
+                        //onChange={handleInputChange}
+                        onChange={(e) => uploadImage(e)}
+                        className={`w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black transition-all ${errors.imageUrl ? 'border-red-500' : 'border-gray-200'
+                          }`}
+                        placeholder="https://example.com/image.jpg"
+                      />
+                      {loading && (
+                        <p className="text-sm text-gray-600 mt-2">Subiendo imagen a Cloudinary...</p>
+                      )}
                       {errors.imageUrl && (
                         <p className="text-red-500 text-sm mt-2">{errors.imageUrl}</p>
                       )}
@@ -473,11 +542,10 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
 
                     {/* Status Badge */}
                     <div
-                      className={`absolute top-6 right-6 px-4 py-2 rounded-full text-sm font-semibold shadow-xl ${
-                        product.isActive
-                          ? 'bg-green-500 text-white'
-                          : 'bg-red-500 text-white'
-                      }`}
+                      className={`absolute top-6 right-6 px-4 py-2 rounded-full text-sm font-semibold shadow-xl ${product.isActive
+                        ? 'bg-green-500 text-white'
+                        : 'bg-red-500 text-white'
+                        }`}
                     >
                       {product.isActive ? 'Activo' : 'Inactivo'}
                     </div>
@@ -564,7 +632,7 @@ export const ProductAdminView: React.FC<ProductAdminViewProps> = ({
               <span>Volver a productos</span>
             </motion.span>
           </Link>
-          
+
           <div className="text-sm text-gray-500">
             Modo administrador activo
           </div>

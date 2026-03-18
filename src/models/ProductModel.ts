@@ -1,4 +1,4 @@
-import type { Product } from '@/types';
+import type { Category, Product } from '@/types';
 
 export class ProductModel {
   static fromJson(raw: unknown): Product {
@@ -10,8 +10,8 @@ export class ProductModel {
     // El backend puede devolver category de diferentes formas:
     // 1. Como objeto: { category: { id, name, slug } }
     // 2. Como campos separados del JOIN: { category_id, category_name, etc }
-    let category = {
-      id: '',
+    let category: Category = {
+      id: 0,
       name: 'Sin categoría',
       slug: '',
     };
