@@ -7,7 +7,7 @@
  */
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'https://interlineal-toreutic-lyn.ngrok-free.dev';
+  process.env.NEXT_PUBLIC_API_URL || 'https://alembic-postgres-pruebas.onrender.com';
 
 const API_DEFAULT_HEADERS = {
   'ngrok-skip-browser-warning': 'true',
