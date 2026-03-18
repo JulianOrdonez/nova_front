@@ -6,7 +6,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -16,13 +16,19 @@ import { useAuth } from '@/hooks/useAuth';
 
 export const LoginForm: React.FC = () => {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, isAuthenticated, loading: authLoading } = useAuth();
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.replace('/productos');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,7 +52,8 @@ export const LoginForm: React.FC = () => {
         return;
       }
 
-      router.push('/productos');
+      router.replace('/productos');
+      router.refresh();
     } catch (err) {
       setError('Error al iniciar sesión. Intenta de nuevo.');
       console.error(err);

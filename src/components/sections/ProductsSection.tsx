@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { AddToCartButton } from '@/components/products/AddToCartButton';
 import { useProducts } from '@/hooks/useApi';
 
 export const ProductsSection: React.FC = () => {
@@ -84,26 +85,31 @@ export const ProductsSection: React.FC = () => {
                   description={product.description}
                   image={product.imageUrl}
                 >
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div>
-                      {product.price !== null ? (
-                        <span className="text-2xl font-bold text-black">
-                          ${product.price.toFixed(2)}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-gray-500 italic">Consultar precio</span>
-                      )}
-                      {product.category && (
-                        <p className="text-xs text-gray-500 mt-1">{product.category.name}</p>
-                      )}
+                  <div className="pt-4 border-t border-gray-100 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        {product.price !== null ? (
+                          <span className="text-2xl font-bold text-black">
+                            ${product.price.toFixed(2)}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-gray-500 italic">Consultar precio</span>
+                        )}
+                        {product.category && (
+                          <p className="text-xs text-gray-500 mt-1">{product.category.name}</p>
+                        )}
+                      </div>
+                      <Link href={`/productos/${product.slug}`}>
+                        <Button
+                          label="Ver más"
+                          variant="outline"
+                          size="sm"
+                        />
+                      </Link>
                     </div>
-                    <Link href={`/productos/${product.slug}`}>
-                      <Button
-                        label="Ver más"
-                        variant="primary"
-                        size="sm"
-                      />
-                    </Link>
+                    {product.price !== null && (
+                      <AddToCartButton productId={product.id} variant="compact" className="w-full justify-center" />
+                    )}
                   </div>
                 </Card>
               </motion.div>

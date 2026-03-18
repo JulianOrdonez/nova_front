@@ -6,7 +6,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -16,7 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 export const RegisterForm: React.FC = () => {
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, isAuthenticated, loading: authLoading } = useAuth();
   const [credentials, setCredentials] = useState<RegisterCredentials>({
     name: '',
     email: '',
@@ -26,6 +26,12 @@ export const RegisterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [agreeTerms, setAgreeTerms] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.replace('/productos');
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,7 +78,8 @@ export const RegisterForm: React.FC = () => {
         return;
       }
 
-      router.push('/productos');
+      router.replace('/productos');
+      router.refresh();
     } catch (err) {
       setError('Error al crear la cuenta. Intenta de nuevo.');
       console.error(err);
